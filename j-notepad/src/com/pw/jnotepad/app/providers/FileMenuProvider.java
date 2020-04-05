@@ -2,35 +2,38 @@ package com.pw.jnotepad.app.providers;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.scene.Scene;
 import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Paths;
 
 public class FileMenuProvider {
 
     private Stage window;
 
-    private  JNotepadDestroyProvider destroyProvider;
+    private CommonUtilProvider commonUtilProvider;
 
     private TextArea textArea;
 
-    public  FileMenuProvider(Stage window, JNotepadDestroyProvider destroyProvider, TextArea textArea){
+    public  FileMenuProvider(Stage window, CommonUtilProvider commonUtilProvider, TextArea textArea){
         this.window = window;
-        this.destroyProvider = destroyProvider;
+        this.commonUtilProvider = commonUtilProvider;
         this.textArea = textArea;
     }
 
     public Menu createFileMenu() {
         Menu fileMenu = new Menu("File");
         MenuItem newFile = new MenuItem("New");
+        newFile.setOnAction(event -> {
+            TextArea newTxtArea = new TextArea();
+            addNewSceneToWindow(getMenuBar(newTxtArea),newTxtArea);
+        });
         MenuItem  openFile = new MenuItem("Open");
         openFile.setOnAction(event -> {
             triggerOpenFile();
@@ -48,7 +51,7 @@ public class FileMenuProvider {
         });
         MenuItem  exitApp = new MenuItem("Exit");
         exitApp.setOnAction(event -> {
-            this.destroyProvider.destroy();
+            this.commonUtilProvider.destroy();
         });
         fileMenu.getItems().addAll(newFile,openFile,saveFile,saveAs,exitApp);
         return fileMenu;
@@ -59,8 +62,38 @@ public class FileMenuProvider {
         File selectedFile = fileChooser.showOpenDialog(this.window);
         if(selectedFile!=null){
             System.out.println(selectedFile.getName()+ " selected to open.");
+            try(BufferedReader reader = new BufferedReader(new FileReader(selectedFile))){
+                String line = reader.readLine();
+                TextArea openTextArea = new TextArea();
+                while (line!=null){
+                    openTextArea.appendText(line);
+                    if(!line.endsWith(System.getProperty("line.separator")))
+                        openTextArea.appendText(System.getProperty("line.separator"));
+                    line = reader.readLine();
+                }
+
+                addNewSceneToWindow(getMenuBar(openTextArea),openTextArea);
+
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
+
+    private void addNewSceneToWindow(MenuBar menuBar,TextArea newTxtArea) {
+        Scene openFileScene = commonUtilProvider.createBorderPaneScene(menuBar,newTxtArea);
+        window.setScene(openFileScene);
+        window.show();
+    }
+
+    private MenuBar getMenuBar(TextArea newTxtArea) {
+        MenuBarProvider menuBarProvider = new MenuBarProvider(window, newTxtArea);
+        MenuBar menuBar = menuBarProvider.createMenuBar();
+        return menuBar;
+    }
+
 
     private void triggerSaveOption(ActionEvent event) {
         FileChooser fileChooser = createFileChooser("Save File");
