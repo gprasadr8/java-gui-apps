@@ -15,10 +15,10 @@ public class MenuBarProvider {
 
     private CommonUtilProvider commonUtilProvider;
 
-    public MenuBarProvider(Stage window, TextArea textArea){
-        this.commonUtilProvider = new CommonUtilProvider(window);
-        this.fileMenuProvider = new FileMenuProvider(window, commonUtilProvider,textArea);
-        this.editMenuProvider = new EditMenuProvider(window);
+    public MenuBarProvider(Stage window){
+        this.commonUtilProvider = CommonUtilProvider.getInstance();
+        this.fileMenuProvider = new FileMenuProvider(window, commonUtilProvider);
+        this.editMenuProvider = new EditMenuProvider();
         this.searchMenuProvider = new SearchMenuProvider(window);
     }
 

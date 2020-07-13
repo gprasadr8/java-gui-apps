@@ -1,14 +1,12 @@
 package com.pw.jnotepad.app;
 
-import com.pw.jnotepad.app.providers.*;
+import com.pw.jnotepad.app.providers.CommonUtilProvider;
+import com.pw.jnotepad.app.providers.MenuBarProvider;
 import javafx.scene.Scene;
-import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 
 public class NotepadController {
-
-    private TextArea textArea;
 
     private CommonUtilProvider commonUtilProvider;
 
@@ -16,12 +14,10 @@ public class NotepadController {
 
 
     public NotepadController(Stage window){
-
-        this.textArea = new TextArea("Welcome to j-notepad");
-        this.menuBarProvider = new MenuBarProvider(window,textArea);
-        this.commonUtilProvider = new CommonUtilProvider(window);
+        this.menuBarProvider = new MenuBarProvider(window);
+        this.commonUtilProvider = CommonUtilProvider.getInstance();
+        this.commonUtilProvider.setWindow(window);
         initJNotepad(window);
-
     }
 
     private void initJNotepad(Stage window) {
@@ -31,7 +27,8 @@ public class NotepadController {
             this.commonUtilProvider.destroy();
         });
 
-        Scene scene = this.commonUtilProvider.createBorderPaneScene(menuBarProvider.createMenuBar(),textArea);
+        Scene scene = this.commonUtilProvider.createBorderPaneScene(menuBarProvider.createMenuBar());
+
         window.setScene(scene);
         window.show();
 

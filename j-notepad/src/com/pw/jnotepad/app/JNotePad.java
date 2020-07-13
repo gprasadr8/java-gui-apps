@@ -22,6 +22,8 @@ import java.nio.file.Paths;
 
 public class JNotePad extends Application {
 
+    public static int notepad_tab_number = 0;
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -30,17 +32,5 @@ public class JNotePad extends Application {
     public void start(Stage primaryStage) {
         NotepadController controller = new NotepadController(primaryStage);
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
